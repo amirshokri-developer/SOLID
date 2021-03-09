@@ -1,0 +1,17 @@
+[
+  {
+    "Code": 12345,
+    "Name": "Tehran",
+    "PolicyType": "Life",
+    "AgeAverage": 21
+  },
+  {
+    "Code": 12345,
+    "Name": "Tehran",
+    "PolicyType": "ThirdParty",
+    "CarCount": 2,
+    "TruckCount" :  4
+  }
+
+
+]
