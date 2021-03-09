@@ -1,39 +1,40 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
-using System.Collections.Generic;
-using System.IO;
-
+﻿
 namespace BranchInsuranceRating
 {
     public class RatingEngine
     {
 
+        public ConsoleLogger Logger { get; set; } = new ConsoleLogger();
+
+        public FileBranchResultSource BranchResultSource { get; set; } = new FileBranchResultSource();
+
+
+        public JsonBranchResultSerializer BranchResultSerializer { get; set; } = new JsonBranchResultSerializer();
+
         public double Rating { get; set; } = 5;
 
         public void Rate()
         {
-            Console.WriteLine("Starting rate.");
+            Logger.Log("Starting rate.");
 
-            Console.WriteLine("Loading data.");
+            Logger.Log("Loading data.");
 
-            string jsonData = File.ReadAllText("data.json");
+            string jsonData = BranchResultSource.GetBranchResultFromSource();
 
-            var branchResults = JsonConvert.DeserializeObject<List<BranchResult>>(jsonData,
-                new StringEnumConverter());
+            var branchResults = BranchResultSerializer.GetBranchResultFromJsonString(jsonData);
 
             foreach (var branchResult in branchResults)
             {
                 switch (branchResult.PolicyType)
                 {
                     case PolicyType.Fire:
-                        Console.WriteLine("Rating Fire policy...");
-                        Console.WriteLine("Validating policy.");
+                        Logger.Log("Rating Fire policy...");
+                        Logger.Log("Validating policy.");
                         if (!branchResult.PlanACount.HasValue ||
                             !branchResult.PlanBCount.HasValue ||
                             !branchResult.PlanCCount.HasValue)
                         {
-                            Console.WriteLine("Plan A and Plan B and Plan C Must Have Value");
+                            Logger.Log("Plan A and Plan B and Plan C Must Have Value");
                             return;
                         }
                         if (branchResult.PlanACount.Value > 5)
@@ -54,11 +55,11 @@ namespace BranchInsuranceRating
                         break;
 
                     case PolicyType.Life:
-                        Console.WriteLine("Rating Life policy...");
-                        Console.WriteLine("Validating policy.");
+                        Logger.Log("Rating Life policy...");
+                        Logger.Log("Validating policy.");
                         if (!branchResult.AgeAverage.HasValue)
                         {
-                            Console.WriteLine("Age Average Must Have Value.");
+                            Logger.Log("Age Average Must Have Value.");
                             return;
                         }
 
@@ -78,12 +79,12 @@ namespace BranchInsuranceRating
                         break;
 
                     case PolicyType.ThirdParty:
-                        Console.WriteLine("Rating ThirdParty policy...");
-                        Console.WriteLine("Validating policy.");
+                        Logger.Log("Rating ThirdParty policy...");
+                        Logger.Log("Validating policy.");
                         if (!branchResult.CarCount.HasValue ||
                             !branchResult.TruckCount.HasValue)
                         {
-                            Console.WriteLine("Third Party Policy Must Have Car Count and Truck Count");
+                            Logger.Log("Third Party Policy Must Have Car Count and Truck Count");
                             return;
                         }
                         if (branchResult.CarCount.Value > 5)
@@ -98,14 +99,14 @@ namespace BranchInsuranceRating
                         break;
 
                     default:
-                        Console.WriteLine("Unknown policy type");
+                        Logger.Log("Unknown policy type");
                         break;
                 }
             }
 
             
 
-            Console.WriteLine("Rating completed.");
+            Logger.Log("Rating completed.");
         }
     }
 }
